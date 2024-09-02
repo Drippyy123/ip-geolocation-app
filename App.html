@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IP Geolocation App</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+            width: 300px;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+
+        input[type="text"] {
+            width: calc(100% - 20px);
+            padding: 10px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            margin-bottom: 10px;
+        }
+
+        button {
+            padding: 10px 15px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .result {
+            margin-top: 20px;
+            display: none;
+        }
+
+        .result p {
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>IP Geolocation</h1>
+        <input type="text" id="ipInput" placeholder="Enter IP Address">
+        <button onclick="getLocation()">Get Location</button>
+
+        <div class="result" id="result">
+            <p><strong>IP Address:</strong> <span id="ip"></span></p>
+            <p><strong>Country:</strong> <span id="country"></span></p>
+            <p><strong>Region:</strong> <span id="region"></span></p>
+            <p><strong>City:</strong> <span id="city"></span></p>
+            <p><strong>ISP:</strong> <span id="isp"></span></p>
+        </div>
+    </div>
+
+    <script>
+        // Function to get URL parameters
+        function getQueryParam(param) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(param);
+        }
+
+        // Function to get geolocation based on IP
+        function getLocation(ip = null) {
+            if (!ip) {
+                ip = document.getElementById('ipInput').value;
+            }
+            if (ip) {
+                fetch(`http://ip-api.com/json/${ip}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            document.getElementById('ip').textContent = data.query;
+                            document.getElementById('country').textContent = data.country;
+                            document.getElementById('region').textContent = data.regionName;
+                            document.getElementById('city').textContent = data.city;
+                            document.getElementById('isp').textContent = data.isp;
+                            document.getElementById('result').style.display = 'block';
+                        } else {
+                            alert('Unable to find location. Please check the IP address.');
+                        }
+                    })
+                    .catch(error => console.error('Error:', error));
+            } else {
+                alert('Please enter an IP address.');
+            }
+        }
+
+        // Automatically check for IP in the query string and get location
+        window.onload = function() {
+            const ip = getQueryParam('ip');
+            if (ip) {
+                getLocation(ip);
+            }
+        };
+    </script>
+</body>
+</html>
